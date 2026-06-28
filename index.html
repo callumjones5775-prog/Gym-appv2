@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Coach</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Load order matters: classic scripts share global scope. -->
+  <script src="js/storage.js"></script>
+  <script src="js/workout.js"></script>
+  <script src="js/rpe.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    // Boot the app once everything is defined.
+    render();
+  </script>
+</body>
+</html>
