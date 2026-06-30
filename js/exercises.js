@@ -1,18 +1,8 @@
 // exercises.js
-// Tagged exercise library. Each entry:
-//   name, muscle, region (upper/lower), equipment, compound,
-//   map (which 1RM anchors the start weight, or null),
-//   start (sensible starting load in kg),
-//   weighted (false = bodyweight reps), timed (true = duration-based).
-
 var MUSCLES_LOWER = ["quads", "hamstrings", "glutes", "calves"];
-
-function isLowerMuscle(m) {
-  return MUSCLES_LOWER.indexOf(m) !== -1;
-}
+function isLowerMuscle(m) { return MUSCLES_LOWER.indexOf(m) !== -1; }
 
 var EXERCISE_LIB = [
-  // ---------- Dumbbell: Chest ----------
   { name: "DB Bench Press", muscle: "chest", equipment: "dumbbells", compound: true, map: "bench", start: 20 },
   { name: "DB Incline Press", muscle: "chest", equipment: "dumbbells", compound: true, map: null, start: 16 },
   { name: "DB Decline Press", muscle: "chest", equipment: "dumbbells", compound: true, map: null, start: 18 },
@@ -20,15 +10,74 @@ var EXERCISE_LIB = [
   { name: "DB Incline Fly", muscle: "chest", equipment: "dumbbells", compound: false, map: null, start: 8 },
   { name: "DB Pullover", muscle: "chest", equipment: "dumbbells", compound: false, map: null, start: 14 },
   { name: "DB Close-Grip Press", muscle: "chest", equipment: "dumbbells", compound: true, map: null, start: 16 },
-
-  // ---------- Dumbbell: Back ----------
   { name: "DB Single-Arm Row", muscle: "back", equipment: "dumbbells", compound: true, map: null, start: 22 },
   { name: "DB Bent-Over Row", muscle: "back", equipment: "dumbbells", compound: true, map: null, start: 20 },
   { name: "DB Deadlift", muscle: "back", equipment: "dumbbells", compound: true, map: "deadlift", start: 24 },
   { name: "DB Shrug", muscle: "back", equipment: "dumbbells", compound: false, map: null, start: 24 },
-
-  // ---------- Dumbbell: Shoulders ----------
   { name: "DB Shoulder Press", muscle: "shoulders", equipment: "dumbbells", compound: true, map: null, start: 14 },
   { name: "DB Arnold Press", muscle: "shoulders", equipment: "dumbbells", compound: true, map: null, start: 12 },
   { name: "DB Lateral Raise", muscle: "shoulders", equipment: "dumbbells", compound: false, map: null, start: 6 },
-  { name: "DB Front Raise", muscle: "shoulders
+  { name: "DB Front Raise", muscle: "shoulders", equipment: "dumbbells", compound: false, map: null, start: 6 },
+  { name: "DB Rear Delt Fly", muscle: "shoulders", equipment: "dumbbells", compound: false, map: null, start: 6 },
+  { name: "DB Upright Row", muscle: "shoulders", equipment: "dumbbells", compound: false, map: null, start: 12 },
+  { name: "DB Bicep Curl", muscle: "biceps", equipment: "dumbbells", compound: false, map: "curl", start: 10 },
+  { name: "DB Hammer Curl", muscle: "biceps", equipment: "dumbbells", compound: false, map: null, start: 10 },
+  { name: "DB Incline Curl", muscle: "biceps", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Concentration Curl", muscle: "biceps", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Zottman Curl", muscle: "biceps", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Overhead Extension", muscle: "triceps", equipment: "dumbbells", compound: false, map: null, start: 10 },
+  { name: "DB Skullcrusher", muscle: "triceps", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Kickback", muscle: "triceps", equipment: "dumbbells", compound: false, map: null, start: 6 },
+  { name: "DB Tate Press", muscle: "triceps", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Goblet Squat", muscle: "quads", equipment: "dumbbells", compound: true, map: null, start: 20 },
+  { name: "DB Lunge", muscle: "quads", equipment: "dumbbells", compound: true, map: null, start: 14 },
+  { name: "DB Bulgarian Split Squat", muscle: "quads", equipment: "dumbbells", compound: true, map: null, start: 14 },
+  { name: "DB Step-Up", muscle: "quads", equipment: "dumbbells", compound: true, map: null, start: 12 },
+  { name: "DB Sumo Squat", muscle: "glutes", equipment: "dumbbells", compound: true, map: null, start: 22 },
+  { name: "DB Romanian Deadlift", muscle: "hamstrings", equipment: "dumbbells", compound: true, map: null, start: 20 },
+  { name: "DB Stiff-Leg Deadlift", muscle: "hamstrings", equipment: "dumbbells", compound: true, map: null, start: 18 },
+  { name: "DB Glute Bridge", muscle: "glutes", equipment: "dumbbells", compound: false, map: null, start: 20 },
+  { name: "DB Calf Raise", muscle: "calves", equipment: "dumbbells", compound: false, map: null, start: 20 },
+  { name: "DB Russian Twist", muscle: "core", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Side Bend", muscle: "core", equipment: "dumbbells", compound: false, map: null, start: 12 },
+  { name: "DB Weighted Sit-Up", muscle: "core", equipment: "dumbbells", compound: false, map: null, start: 8 },
+  { name: "DB Renegade Row", muscle: "core", equipment: "dumbbells", compound: true, map: null, start: 10 },
+  { name: "Smith Bench Press", muscle: "chest", equipment: "smith", compound: true, map: "bench", start: 40 },
+  { name: "Smith Incline Press", muscle: "chest", equipment: "smith", compound: true, map: null, start: 30 },
+  { name: "Smith Overhead Press", muscle: "shoulders", equipment: "smith", compound: true, map: null, start: 25 },
+  { name: "Smith Row", muscle: "back", equipment: "smith", compound: true, map: null, start: 35 },
+  { name: "Smith Squat", muscle: "quads", equipment: "smith", compound: true, map: "squat", start: 40 },
+  { name: "Smith Romanian Deadlift", muscle: "hamstrings", equipment: "smith", compound: true, map: null, start: 40 },
+  { name: "Smith Calf Raise", muscle: "calves", equipment: "smith", compound: false, map: null, start: 40 },
+  { name: "Chest Press Machine", muscle: "chest", equipment: "chest-press", compound: true, map: "bench", start: 30 },
+  { name: "Pec Deck Fly", muscle: "chest", equipment: "pec-deck", compound: false, map: null, start: 25 },
+  { name: "Cable Chest Fly", muscle: "chest", equipment: "cable", compound: false, map: null, start: 10 },
+  { name: "Cable Tricep Pushdown", muscle: "triceps", equipment: "cable", compound: false, map: null, start: 20 },
+  { name: "Cable Rope Pushdown", muscle: "triceps", equipment: "cable", compound: false, map: null, start: 18 },
+  { name: "Cable Bicep Curl", muscle: "biceps", equipment: "cable", compound: false, map: null, start: 18 },
+  { name: "Cable Lateral Raise", muscle: "shoulders", equipment: "cable", compound: false, map: null, start: 8 },
+  { name: "Cable Face Pull", muscle: "shoulders", equipment: "cable", compound: false, map: null, start: 18 },
+  { name: "Cable Row", muscle: "back", equipment: "cable", compound: true, map: null, start: 30 },
+  { name: "Cable Woodchopper", muscle: "core", equipment: "cable", compound: false, map: null, start: 12 },
+  { name: "Cable Pull-Through", muscle: "glutes", equipment: "cable", compound: false, map: null, start: 20 },
+  { name: "Cable Glute Kickback", muscle: "glutes", equipment: "cable", compound: false, map: null, start: 12 },
+  { name: "Cable Crunch", muscle: "core", equipment: "cable", compound: false, map: null, start: 25 },
+  { name: "Lat Pulldown", muscle: "back", equipment: "lat-pulldown", compound: true, map: null, start: 35 },
+  { name: "Close-Grip Pulldown", muscle: "back", equipment: "lat-pulldown", compound: true, map: null, start: 35 },
+  { name: "Seated Row Machine", muscle: "back", equipment: "row-machine", compound: true, map: null, start: 35 },
+  { name: "Leg Extension", muscle: "quads", equipment: "leg-extension", compound: false, map: null, start: 30 },
+  { name: "Leg Curl", muscle: "hamstrings", equipment: "leg-curl", compound: false, map: null, start: 25 },
+  { name: "Machine Bicep Curl", muscle: "biceps", equipment: "curl-machine", compound: false, map: "curl", start: 20 },
+  { name: "Machine Ab Crunch", muscle: "core", equipment: "ab-crunch", compound: false, map: null, start: 25 },
+  { name: "Push-Ups", muscle: "chest", equipment: "bodyweight", compound: true, map: null, start: 0, weighted: false },
+  { name: "Pull-Ups", muscle: "back", equipment: "bodyweight", compound: true, map: null, start: 0, weighted: false },
+  { name: "Dips", muscle: "triceps", equipment: "bodyweight", compound: true, map: null, start: 0, weighted: false },
+  { name: "Bodyweight Squat", muscle: "quads", equipment: "bodyweight", compound: true, map: null, start: 0, weighted: false },
+  { name: "Plank", muscle: "core", equipment: "bodyweight", compound: false, map: null, start: 0, weighted: false, timed: true },
+  { name: "Mountain Climbers", muscle: "core", equipment: "bodyweight", compound: false, map: null, start: 0, weighted: false, timed: true },
+  { name: "Treadmill Run", muscle: "cardio", equipment: "treadmill", compound: true, map: null, start: 0, weighted: false, timed: true },
+  { name: "Treadmill Incline Walk", muscle: "cardio", equipment: "treadmill", compound: true, map: null, start: 0, weighted: false, timed: true },
+  { name: "Stationary Bike", muscle: "cardio", equipment: "bike", compound: true, map: null, start: 0, weighted: false, timed: true },
+  { name: "Stair Master", muscle: "cardio", equipment: "stairmaster", compound: true, map: null, start: 0, weighted: false, timed: true },
+  { name: "Rowing Erg", muscle: "cardio", equipment: "rower", compound: true, map: null, start: 0, weighted: false, timed: true }
+];
