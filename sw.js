@@ -1,5 +1,5 @@
 // sw.js — minimal offline cache for the app shell.
-var CACHE = "gym-coach-v1";
+var CACHE = "gym-coach-v2";
 var ASSETS = [
   "./", "./index.html", "./css/style.css",
   "./js/storage.js", "./js/exercises.js", "./js/workout.js",
