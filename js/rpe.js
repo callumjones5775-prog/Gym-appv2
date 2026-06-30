@@ -1,43 +1,86 @@
 // rpe.js
-// RPE feedback adjusts the stored weights for the exercises just performed.
+// Adaptive progression. Instead of fixed +2.5/+5 steps, each exercise learns
+// from its own RPE history: weight moves by a % scaled to how far the last
+// effort was from the goal's target RPE, accelerates on easy streaks, and
+// drops for recovery if you stall on repeated maximal efforts.
 
-var LOWER_BODY = [
-  "squat",
-  "deadlift",
-  "lunge",
-  "leg press",
-  "romanian deadlift",
-  "calf raise"
-];
+function targetRpe() {
+  var g = GOALS[getGoal()];
+  return g ? g.targetRpe : 8;
+}
 
-function isLowerBody(exerciseName) {
-  var n = exerciseName.toLowerCase();
-  for (var i = 0; i < LOWER_BODY.length; i++) {
-    if (n.indexOf(LOWER_BODY[i]) !== -1) return true;
+// Returns { weight, reason } for the next session of this exercise.
+function nextWeight(exName, equipment, lastRpe) {
+  var p = user.progression[exName];
+  var w = p.weight;
+  var rpes = (p.rpes || []).slice();
+  var tgt = targetRpe();
+  var fakeEx = { equipment: equipment };
+
+  var diff = tgt - lastRpe; // positive = easier than target = push up
+  var stepPct = diff * 0.03; // ~3% per RPE point
+  var reason = "";
+
+  var recent = rpes.slice(-2).concat([lastRpe]);
+
+  // Easy streak -> accelerate.
+  if (
+    recent.length >= 3 &&
+    recent.every(function (r) {
+      return r <= tgt - 1;
+    })
+  ) {
+    stepPct += 0.02;
+    reason = "3 easy sessions — accelerating";
   }
-  return false;
+
+  // Repeated maximal grind -> recovery drop.
+  if (
+    recent.length >= 3 &&
+    recent.every(function (r) {
+      return r >= 9;
+    })
+  ) {
+    stepPct = -0.1;
+    reason = "Stalling — recovery drop";
+  }
+
+  if (!reason) {
+    if (diff >= 2) reason = "Felt easy — moving up";
+    else if (diff > 0) reason = "Slightly easy — small bump";
+    else if (diff === 0) reason = "Dialed in — holding";
+    else if (diff > -2) reason = "Tough — easing slightly";
+    else reason = "Very hard — dropping";
+  }
+
+  var nw = roundFor(fakeEx, w * (1 + stepPct));
+  if (nw < 0) nw = 0;
+
+  return { weight: nw, reason: reason };
 }
 
-// Lower body progresses in larger jumps than upper body.
-function getIncrement(exerciseName) {
-  return isLowerBody(exerciseName) ? 5 : 2.5;
-}
-
-// rpe <= 7 -> too easy -> add weight.
-// rpe >= 9 -> too hard -> remove weight.
-// rpe == 8 -> just right -> no change.
-function adjustWeights(workout, rpe) {
+// Apply each exercise's own RPE (ex.rpe set on the workout item), logging
+// history so the trend logic has per-lift data to learn from.
+function applyWorkoutRpe(workout) {
   for (var i = 0; i < workout.exercises.length; i++) {
-    var name = workout.exercises[i].name;
-    var step = getIncrement(name);
+    var ex = workout.exercises[i];
+    var p = user.progression[ex.name];
+    if (!p) continue;
+    if (!p.rpes) p.rpes = [];
 
-    if (rpe <= 7) {
-      user.progression[name].weight = user.progression[name].weight + step;
-    } else if (rpe >= 9) {
-      user.progression[name].weight = Math.max(
-        0,
-        user.progression[name].weight - step
-      );
+    var rpe = typeof ex.rpe === "number" ? ex.rpe : 8;
+
+    if (ex.weighted && !ex.timed) {
+      var next = nextWeight(ex.name, ex.equipment, rpe);
+      p.weight = next.weight;
+      p.reason = next.reason;
+    } else if (ex.timed) {
+      p.reason = rpe <= targetRpe() ? "Add 10–15s next time" : "Hold the time";
+    } else {
+      p.reason = rpe <= targetRpe() ? "Add a rep or two" : "Hold the reps";
     }
+
+    p.rpes.push(rpe);
+    if (p.rpes.length > 6) p.rpes = p.rpes.slice(-6);
   }
 }
